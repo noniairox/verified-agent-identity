@@ -2,6 +2,15 @@ name: Verify Human Identity
 
 on:
   workflow_dispatch:
+    inputs:
+      agent_name:
+        description: 'noniairo'
+        required: true
+        default: 'noniairo'
+      agent_description:
+        description: 'noniairo'
+        required: true
+        default: 'noniairo AI Agent'
 
 jobs:
   verify:
@@ -14,27 +23,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
-          cache: npm
+          node-version: '20'
 
-      - name: Set npm registry
-        run: npm config set registry https://registry.npmjs.org/
-
-      - name: Install Clawhub
-        run: npm install -g clawhub
-
-      - name: Install verified-agent-identity
-        run: clawhub install verified-agent-identity
+      - name: Step 1 - Install Clawhub skill
+        run: npx clawhub@latest install verified-agent-identity
 
       - name: Install script dependencies
         run: |
           cd scripts
           npm install
 
-      - name: Create Ethereum Identity
+      - name: Step 2 - Create new Ethereum Identity
         run: node scripts/createNewEthereumIdentity.js
 
-      - name: Link Human to Agent
-        run: |
-          node scripts/manualLinkHumanToAgent.js \
-          --challenge '{"name":"noniairo","description":"noniairo AI Agent"}'
+      - name: Step 3 - Link Human to Agent
+        run: node scripts/manualLinkHumanToAgent.js --challenge '{"name":"noniairo","description":"noniairo AI Agent"}'
